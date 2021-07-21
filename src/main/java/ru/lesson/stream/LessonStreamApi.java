@@ -57,7 +57,7 @@ public class LessonStreamApi {
      */
     public List<Employee> task4(List<List<Employee>> employeeDepartments) {
         return employeeDepartments.stream()
-                .flatMap(employees -> employees.stream())
+                .flatMap(List::stream)
                 .distinct()
                 .sorted(Comparator.comparing(Employee::getRating).reversed())
                 .collect(Collectors.toList());
