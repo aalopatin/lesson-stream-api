@@ -20,7 +20,7 @@ public class LessonStreamApi {
      * Важно: Необходимо учесть, что List<Employee> employees может содержать дублирующие записи.
      */
     public List<Employee> task1(List<Employee> employees) {
-        return null;
+        return employees.stream().distinct().filter(employee -> employee.getRating() > 50).collect(Collectors.toList());
     }
 
     /**
@@ -29,7 +29,10 @@ public class LessonStreamApi {
      * у которых рейтинг {@link Employee#getRating()} меньше 50.
      */
     public List<String> task2(List<Employee> employees) {
-        return null;
+        return employees.stream()
+                .filter(employee -> employee.getRating() < 50)
+                .map(employee -> String.format("%s=%s", employee.getName(), employee.getRating()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -37,7 +40,9 @@ public class LessonStreamApi {
      * Получить средний райтинг всех сотрудников.
      */
     public double task3(List<Employee> employees) {
-        return 0;
+        return employees.stream()
+                .mapToInt(Employee::getRating)
+                .average().getAsDouble();
     }
 
     /**
@@ -50,7 +55,12 @@ public class LessonStreamApi {
      * @return список сотрудников
      */
     public List<Employee> task4(List<List<Employee>> employeeDepartments) {
-        return null;
+        return employeeDepartments.stream()
+                .flatMap(employees -> employees.stream())
+                .distinct()
+                .sorted(Comparator.comparing(Employee::getRating).reversed())
+                .collect(Collectors.toList());
+
     }
 
     /**
@@ -74,7 +84,10 @@ public class LessonStreamApi {
         if (number <= 0) {
             throw new IllegalArgumentException(Integer.toString(number));
         }
-        return null;
+        return employees.stream()
+                .skip((number-1)*size)
+                .limit(size)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -86,7 +99,9 @@ public class LessonStreamApi {
      * @return имена сотрудников в String
      */
     public String task6(List<Employee> employees) {
-        return null;
+        return employees.stream()
+                .map(Employee::getName)
+                .collect(Collectors.joining(", ", "[", "]"));
     }
 
     /**
@@ -97,7 +112,17 @@ public class LessonStreamApi {
      * @return если дубли существуют, то true, иначе false
      */
     public boolean task7(List<Employee> employees) {
-        return false;
+        return employees.stream()
+                .map(Employee::getName)
+                .collect(Collectors
+                        .toMap(
+                                employee -> employee,
+                                employee -> 1,
+                                (i, i2) -> i + i2
+                        )
+                )
+                .values().stream()
+                .anyMatch(value -> value != 1);
     }
 
     /**
@@ -108,7 +133,14 @@ public class LessonStreamApi {
      * @return словарь должность и райтинг
      */
     public Map<PositionType, Double> task8(List<Employee> employees) {
-        return null;
+        return employees.stream()
+                .collect(
+                        Collectors
+                                .groupingBy(
+                                        Employee::getPositionType,
+                                        Collectors.averagingDouble(Employee::getRating)
+                                )
+                );
     }
 
     /**
@@ -122,7 +154,15 @@ public class LessonStreamApi {
      * @return словарь с количеством эффективных и неэффективных сотрудников
      */
     public Map<Boolean, Long> task9(List<Employee> employees) {
-        return null;
+        return employees.stream()
+                .collect(
+                        Collectors
+                                .partitioningBy(
+                                        employee -> employee.getRating() > 50,
+                                        Collectors.mapping(employee -> employee, Collectors.counting()
+                                        )
+                                )
+                );
     }
 
     /**
@@ -136,7 +176,15 @@ public class LessonStreamApi {
      * @return словарь с списком имен {@link Employee#getName()} через ", " эффективных и неэффективных сотрудников
      */
     public Map<Boolean, String> task10(List<Employee> employees) {
-        return null;
+        return employees.stream()
+                .collect(
+                        Collectors
+                                .partitioningBy(
+                                        employee -> employee.getRating() > 50,
+                                        Collectors.mapping(employee -> employee.getName(), Collectors.joining(", ")
+                                        )
+                                )
+                );
     }
 
 }
