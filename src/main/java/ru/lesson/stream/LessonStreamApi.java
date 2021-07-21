@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -114,15 +115,14 @@ public class LessonStreamApi {
     public boolean task7(List<Employee> employees) {
         return employees.stream()
                 .map(Employee::getName)
-                .collect(Collectors
-                        .toMap(
-                                employee -> employee,
-                                employee -> 1,
-                                (i, i2) -> i + i2
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
                         )
                 )
-                .values().stream()
-                .anyMatch(value -> value != 1);
+                .values()
+                .stream()
+                .anyMatch(value -> value > 1);
     }
 
     /**
